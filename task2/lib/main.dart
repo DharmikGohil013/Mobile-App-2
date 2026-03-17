@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// MainActivity equivalent - First Screen for data input
 class MainActivity extends StatefulWidget {
   const MainActivity({super.key});
 
@@ -36,7 +35,6 @@ class _MainActivityState extends State<MainActivity> {
   Color _feedbackColor = Colors.transparent;
 
   void _sendData() {
-    // Validation: Check if fields are empty
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _messageController.text.isEmpty) {
@@ -47,7 +45,6 @@ class _MainActivityState extends State<MainActivity> {
       return;
     }
 
-    // Validate email format
     if (!_isValidEmail(_emailController.text)) {
       setState(() {
         _feedbackMessage = '❌ Please enter a valid email address!';
@@ -56,7 +53,6 @@ class _MainActivityState extends State<MainActivity> {
       return;
     }
 
-    // If validation passes, prepare data and navigate to SecondActivity
     final userData = {
       'name': _nameController.text,
       'email': _emailController.text,
@@ -68,7 +64,6 @@ class _MainActivityState extends State<MainActivity> {
       _feedbackColor = Colors.green;
     });
 
-    // Navigate to SecondActivity with data (using explicit route/intent equivalent)
     Future.delayed(const Duration(milliseconds: 500), () {
       Navigator.push(
         context,
@@ -80,7 +75,9 @@ class _MainActivityState extends State<MainActivity> {
   }
 
   bool _isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     return emailRegex.hasMatch(email);
   }
 
@@ -105,7 +102,6 @@ class _MainActivityState extends State<MainActivity> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
               const Text(
                 'Enter Your Information',
                 style: TextStyle(
@@ -116,7 +112,6 @@ class _MainActivityState extends State<MainActivity> {
               ),
               const SizedBox(height: 30),
 
-              // Name Input Field
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -132,7 +127,6 @@ class _MainActivityState extends State<MainActivity> {
               ),
               const SizedBox(height: 16),
 
-              // Email Input Field
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -149,7 +143,6 @@ class _MainActivityState extends State<MainActivity> {
               ),
               const SizedBox(height: 16),
 
-              // Message Input Field
               TextField(
                 controller: _messageController,
                 maxLines: 4,
@@ -166,7 +159,6 @@ class _MainActivityState extends State<MainActivity> {
               ),
               const SizedBox(height: 20),
 
-              // Feedback Message
               if (_feedbackMessage.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -185,7 +177,6 @@ class _MainActivityState extends State<MainActivity> {
                 ),
               const SizedBox(height: 24),
 
-              // Send Data Button
               ElevatedButton(
                 onPressed: _sendData,
                 style: ElevatedButton.styleFrom(
@@ -212,7 +203,6 @@ class _MainActivityState extends State<MainActivity> {
   }
 }
 
-// SecondActivity equivalent - Second Screen for displaying received data
 class SecondActivity extends StatelessWidget {
   final Map<String, String> userData;
 
@@ -227,7 +217,7 @@ class SecondActivity extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Back button functionality
+            Navigator.pop(context);
           },
         ),
       ),
@@ -237,7 +227,6 @@ class SecondActivity extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
               const Text(
                 'Data Received From MainActivity',
                 style: TextStyle(
@@ -248,7 +237,6 @@ class SecondActivity extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Name Display (TextView equivalent)
               _buildDataCard(
                 icon: Icons.person,
                 label: 'Full Name',
@@ -256,7 +244,6 @@ class SecondActivity extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Email Display (TextView equivalent)
               _buildDataCard(
                 icon: Icons.email,
                 label: 'Email Address',
@@ -264,7 +251,6 @@ class SecondActivity extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Message Display (TextView equivalent)
               _buildDataCard(
                 icon: Icons.message,
                 label: 'Message',
@@ -272,7 +258,6 @@ class SecondActivity extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Back to MainActivity Button
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -300,7 +285,6 @@ class SecondActivity extends StatelessWidget {
     );
   }
 
-  // Helper widget to display data cards
   Widget _buildDataCard({
     required IconData icon,
     required String label,
