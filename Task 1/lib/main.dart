@@ -1,4 +1,4 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,18 +39,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both username and password.')),
+        const SnackBar(
+          content: Text('Please enter both username and password.'),
+        ),
       );
       return;
     }
 
     if (username == correctUsername && password == correctPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login successful!')));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid username or password. Please try again.')),
+        const SnackBar(
+          content: Text('Invalid username or password. Please try again.'),
+        ),
       );
     }
   }
@@ -69,11 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const Icon(
-                  Icons.lock,
-                  size: 100,
-                  color: Colors.blue,
-                ),
+                const Icon(Icons.lock, size: 100, color: Colors.blue),
                 const SizedBox(height: 32),
                 TextField(
                   controller: _usernameController,
@@ -97,7 +97,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
                   ),
                   child: const Text('Login'),
                 ),
