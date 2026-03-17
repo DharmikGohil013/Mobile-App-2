@@ -7,115 +7,339 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Intent Data Transfer App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MainActivity(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// MainActivity equivalent - First Screen for data input
+class MainActivity extends StatefulWidget {
+  const MainActivity({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainActivity> createState() => _MainActivityState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainActivityState extends State<MainActivity> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  String _feedbackMessage = '';
+  Color _feedbackColor = Colors.transparent;
 
-  void _incrementCounter() {
+  void _sendData() {
+    // Validation: Check if fields are empty
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _messageController.text.isEmpty) {
+      setState(() {
+        _feedbackMessage = '❌ All fields are required!';
+        _feedbackColor = Colors.red;
+      });
+      return;
+    }
+
+    // Validate email format
+    if (!_isValidEmail(_emailController.text)) {
+      setState(() {
+        _feedbackMessage = '❌ Please enter a valid email address!';
+        _feedbackColor = Colors.red;
+      });
+      return;
+    }
+
+    // If validation passes, prepare data and navigate to SecondActivity
+    final userData = {
+      'name': _nameController.text,
+      'email': _emailController.text,
+      'message': _messageController.text,
+    };
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _feedbackMessage = '✓ Data sent successfully!';
+      _feedbackColor = Colors.green;
     });
+
+    // Navigate to SecondActivity with data (using explicit route/intent equivalent)
+    Future.delayed(const Duration(milliseconds: 500), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SecondActivity(userData: userData),
+        ),
+      );
+    });
+  }
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _messageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('MainActivity - Send Data'),
+        elevation: 0,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              const Text(
+                'Enter Your Information',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Name Input Field
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  hintText: 'Enter your full name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: const Icon(Icons.person),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Email Input Field
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  hintText: 'Enter your email address',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: const Icon(Icons.email),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Message Input Field
+              TextField(
+                controller: _messageController,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  labelText: 'Message',
+                  hintText: 'Enter your message',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: const Icon(Icons.message),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Feedback Message
+              if (_feedbackMessage.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _feedbackColor.withOpacity(0.1),
+                    border: Border.all(color: _feedbackColor),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _feedbackMessage,
+                    style: TextStyle(
+                      color: _feedbackColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 24),
+
+              // Send Data Button
+              ElevatedButton(
+                onPressed: _sendData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Send Data',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+// SecondActivity equivalent - Second Screen for displaying received data
+class SecondActivity extends StatelessWidget {
+  final Map<String, String> userData;
+
+  const SecondActivity({super.key, required this.userData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('SecondActivity - Received Data'),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Back button functionality
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              const Text(
+                'Data Received From MainActivity',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Name Display (TextView equivalent)
+              _buildDataCard(
+                icon: Icons.person,
+                label: 'Full Name',
+                value: userData['name'] ?? 'N/A',
+              ),
+              const SizedBox(height: 16),
+
+              // Email Display (TextView equivalent)
+              _buildDataCard(
+                icon: Icons.email,
+                label: 'Email Address',
+                value: userData['email'] ?? 'N/A',
+              ),
+              const SizedBox(height: 16),
+
+              // Message Display (TextView equivalent)
+              _buildDataCard(
+                icon: Icons.message,
+                label: 'Message',
+                value: userData['message'] ?? 'N/A',
+              ),
+              const SizedBox(height: 30),
+
+              // Back to MainActivity Button
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.greenAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Back to MainActivity',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper widget to display data cards
+  Widget _buildDataCard({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        border: Border.all(color: Colors.blueAccent, width: 2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: Colors.blueAccent),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }
